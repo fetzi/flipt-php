@@ -1,0 +1,13 @@
+{
+    "requestId": "eaee520e-23c3-49ad-b729-7226c1a004d8",
+    "entityId": "id",
+    "requestContext": {
+        "foo": "bar"
+    },
+    "match": true,
+    "flagKey": "foo",
+    "segmentKey": "sampleSegment",
+    "timestamp": "2021-05-21T10:08:46.505577Z",
+    "value": "a",
+    "requestDurationMillis": 11.248
+}

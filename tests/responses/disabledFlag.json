@@ -1,0 +1,6 @@
+{
+    "error": "flag \"foo\" is disabled",
+    "code": 3,
+    "message": "flag \"foo\" is disabled",
+    "details": []
+}

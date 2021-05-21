@@ -1,0 +1,51 @@
+{
+    "name": "fetzi/flipt-php",
+    "description": "A PHP package for integrating the Flipt REST API",
+    "keywords": [
+        "php",
+        "flipt",
+        "feature flags"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Johannes Pichler",
+            "email": "admin@fetzi.dev"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Fetzi\\Flipt\\": "src"
+        }
+    },
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "psr/http-client-implementation": "^1.0",
+        "psr/http-message": "^1.0",
+        "psr/http-factory": "^1.0",
+        "php-http/httplug": "^2.2",
+        "php-http/discovery": "^1.13"
+    },
+    "require-dev": {
+        "pestphp/pest": "^1.2",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "phpstan/phpstan": "^0.12.88",
+        "phpstan/phpstan-strict-rules": "^0.12.9",
+        "ergebnis/phpstan-rules": "^0.15.3",
+        "thecodingmachine/phpstan-strict-rules": "^0.12.1",
+        "php-http/mock-client": "^1.4",
+        "mockery/mockery": "^1.4",
+        "guzzlehttp/guzzle": "^7.3"
+    },
+    "scripts": {
+        "test:unit": "vendor/bin/pest --colors=always",
+        "test:lint": "vendor/bin/php-cs-fixer fix -v --dry-run",
+        "test:types":"vendor/bin/phpstan analyse --ansi --memory-limit=0",
+        "fix": "vendor/bin/php-cs-fixer fix -v",
+        "test": [
+            "@test:lint",
+            "@test:types",
+            "@test:unit"
+        ]
+    }
+}
