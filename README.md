@@ -23,7 +23,7 @@ $flipt = Flipt::create('http://localhost:8080');
 By calling the `evaluate` method you can check if a certain user (entity) should get a certain feature or not. To perform a evaluation you need to create a `EvaluateRequest` that contains the data to evaluate.
 
 ```php
-$evaluateRequest = new EvaluateRequest('sample-flag', 'user-id', ['foo' => 'bar'])
+$evaluateRequest = new EvaluateRequest('sample-flag', 'user-id', ['foo' => 'bar']);
 $evaluateResponse = $flipt->evaluate($evaluateRequest);
 
 if ($evaluateResponse->isMatch()) {
@@ -39,7 +39,7 @@ To be able to determine which variant of a feature-flag should be displayed you 
 The `EvaluateResponse` also provides a variant that can be accessed via the `getValue()` or `getVariant()` method:
 
 ```php
-$evaluateRequest = new EvaluateRequest('sample-flag', 'user-id', ['foo' => 'bar'])
+$evaluateRequest = new EvaluateRequest('sample-flag', 'user-id', ['foo' => 'bar']);
 $evaluateResponse = $flipt->evaluate($evaluateRequest);
 
 if ($evaluateResponse->isMatch()) {
