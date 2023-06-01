@@ -12,7 +12,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class Flipt
 {
-    private const RELATIVE_EVALUATE_ENDPOINT       = '/api/v1/evaluate';
+    private const RELATIVE_EVALUATE_ENDPOINT = '/api/v1/evaluate';
 
     private HttpClient $client;
 
@@ -34,15 +34,15 @@ final class Flipt
 
     public function __construct(HttpClient $client, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, string $baseUrl)
     {
-        $this->client          = $client;
-        $this->requestFactory  = $requestFactory;
-        $this->streamFactory   = $streamFactory;
+        $this->client = $client;
+        $this->requestFactory = $requestFactory;
+        $this->streamFactory = $streamFactory;
 
         if (mb_substr($baseUrl, -1) === '/') {
             $baseUrl = mb_substr($baseUrl, 0, -1);
         }
 
-        $this->evaluateEndoint       = $baseUrl . static::RELATIVE_EVALUATE_ENDPOINT;
+        $this->evaluateEndoint = $baseUrl . static::RELATIVE_EVALUATE_ENDPOINT;
     }
 
     public function evaluate(EvaluateRequest $evaluateRequest): EvaluateResponse
@@ -63,7 +63,7 @@ final class Flipt
             ->withBody($this->streamFactory->createStream($json));
 
         $response = $this->client->sendRequest($request);
-        $data     = json_decode($response->getBody()->getContents(), true);
+        $data = json_decode($response->getBody()->getContents(), true);
 
         return new EvaluateResponse($data);
     }

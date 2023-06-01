@@ -1,5 +1,5 @@
 {
-    "name": "fetzi/flipt-php",
+    "name": "indels/flipt-php",
     "description": "A PHP package for integrating the Flipt REST API",
     "keywords": [
         "php",
