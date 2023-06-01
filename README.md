@@ -10,7 +10,7 @@
 ## Installation
 
 ```
-composer require fetzi/flipt-php
+composer require indels/flipt-php
 ```
 
 ## Usage

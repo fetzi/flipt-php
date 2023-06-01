@@ -12,7 +12,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class Flipt
 {
-    private const RELATIVE_EVALUATE_ENDPOINT       = '/api/v1/evaluate';
+    private const RELATIVE_EVALUATE_ENDPOINT = '/api/v1/evaluate';
 
     private HttpClient $client;
 

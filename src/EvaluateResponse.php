@@ -8,8 +8,8 @@ use DateTime;
 
 final class EvaluateResponse
 {
-    private string $requestId            = '';
-    private string $entityId             = '';
+    private string $requestId = '';
+    private string $entityId  = '';
 
     /**
      * @var array<mixed, mixed>
@@ -43,7 +43,7 @@ final class EvaluateResponse
         $this->match                 = $data['match'] ?? false;
         $this->flagKey               = $data['flagKey'] ?? '';
         $this->segmentKey            = $data['segmentKey'] ?? '';
-        $this->timestamp             = new DateTime($data['timestamp'] ?? 'now');
+        $this->timestamp             = $data['timestamp'] ? DateTime::createFromFormat('Y-m-d\TH:i:s.uu\Z', $data['timestamp']) : DateTime('now');
         $this->value                 = $data['value'] ?? '';
         $this->requestDurationMillis = $data['requestDurationMillis'] ?? 0.0;
     }
