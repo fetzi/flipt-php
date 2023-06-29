@@ -11,12 +11,12 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 
 beforeEach(function () {
-    $this->client = new Client();
+    $this->client   = new Client();
     $requestFactory = Mockery::mock(RequestFactoryInterface::class)->shouldIgnoreMissing();
-    $streamFactory = Mockery::mock(StreamFactoryInterface::class)->shouldIgnoreMissing();
+    $streamFactory  = Mockery::mock(StreamFactoryInterface::class)->shouldIgnoreMissing();
 
-    $request = Mockery::mock(RequestInterface::class);
-    $response = Mockery::mock(ResponseInterface::class);
+    $request      = Mockery::mock(RequestInterface::class);
+    $response     = Mockery::mock(ResponseInterface::class);
     $this->stream = Mockery::mock(StreamInterface::class);
 
     $requestFactory->shouldReceive('createRequest')->andReturn($request);

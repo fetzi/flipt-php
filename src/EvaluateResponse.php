@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Fetzi\Flipt;
 
-use DateTime;
-
 final class EvaluateResponse
 {
     private string $requestId = '';
@@ -18,7 +16,7 @@ final class EvaluateResponse
     private bool $match                  = false;
     private string $flagKey              = '';
     private string $segmentKey           = '';
-    private DateTime $timestamp;
+    private \DateTime $timestamp;
     private string $value                = '';
     private float $requestDurationMillis = 0.0;
 
@@ -43,9 +41,7 @@ final class EvaluateResponse
         $this->match                 = $data['match'] ?? false;
         $this->flagKey               = $data['flagKey'] ?? '';
         $this->segmentKey            = $data['segmentKey'] ?? '';
-        $this->timestamp             = isset($data['timestamp'])
-            ? DateTime::createFromFormat('Y-m-d\TH:i:s.uu\Z', $data['timestamp'])
-            : new DateTime('now');
+        $this->timestamp             = new \DateTime($data['timestamp'] ?? 'now');
         $this->value                 = $data['value'] ?? '';
         $this->requestDurationMillis = $data['requestDurationMillis'] ?? 0.0;
     }
@@ -92,7 +88,7 @@ final class EvaluateResponse
         return $this->segmentKey;
     }
 
-    public function getTimestamp(): DateTime
+    public function getTimestamp(): \DateTime
     {
         return $this->timestamp;
     }

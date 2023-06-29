@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Fetzi\Flipt;
 
-use JsonSerializable;
-
-final class EvaluateRequest implements JsonSerializable
+final class EvaluateRequest implements \JsonSerializable
 {
     private string $flagKey;
     private string $entityId;
