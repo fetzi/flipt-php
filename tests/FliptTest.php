@@ -51,6 +51,16 @@ it('matches a simple feature flag', function () {
     expect($response->isMatch())->toBeTrue();
 });
 
+it('matches a simple feature flag 2', function () {
+    $this->stream->shouldReceive('getContents')->andReturn(file_get_contents(__DIR__ . '/responses/simpleMatched2.json'));
+
+    $response = $this->flipt->evaluate(new EvaluateRequest('foo', 'id', []));
+
+    expect($response)->toBeInstanceOf(EvaluateResponse::class);
+    expect($response->hasError())->toBeFalse();
+    expect($response->isMatch())->toBeTrue();
+});
+
 it('does not match a simple feature flag', function () {
     $this->stream->shouldReceive('getContents')->andReturn(file_get_contents(__DIR__ . '/responses/simpleNotMatched.json'));
 
