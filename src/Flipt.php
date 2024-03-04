@@ -12,7 +12,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class Flipt
 {
-    private const EVALUATE_ENDPOINT_WITH_NAMESPACE = '/api/v1/namespaces/%s/evaluate';
+    private const EVALUATE_ENDPOINT_WITH_NAMESPACE       = '/api/v1/namespaces/%s/evaluate';
     private const EVALUATE_BATCH_ENDPOINT_WITH_NAMESPACE = '/api/v1/namespaces/%s/batch-evaluate';
 
     private HttpClient $client;
@@ -71,7 +71,7 @@ final class Flipt
 
     /**
      * @param EvaluateRequest[] $evaluateRequests
-     * @param string $namespace
+     *
      * @return EvaluateResponse[]
      */
     public function evaluateBatch(array $evaluateRequests, string $namespace): array
@@ -91,9 +91,9 @@ final class Flipt
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream($json));
 
-        $response = $this->client->sendRequest($request);
+        $response     = $this->client->sendRequest($request);
         $responseBody = json_decode($response->getBody()->getContents(), true);
 
-        return array_map(fn($data) => new EvaluateResponse($data), $responseBody);
+        return array_map(fn ($data) => new EvaluateResponse($data), $responseBody);
     }
 }
