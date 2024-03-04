@@ -12,7 +12,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class Flipt
 {
-    private const RELATIVE_EVALUATE_ENDPOINT = '/api/v1/evaluate';
+    private const EVALUATE_ENDPOINT_WITH_NAMESPACE = '/api/v1/namespaces/%s/evaluate';
+    private const EVALUATE_BATCH_ENDPOINT_WITH_NAMESPACE = '/api/v1/namespaces/%s/batch-evaluate';
 
     private HttpClient $client;
 
@@ -20,7 +21,7 @@ final class Flipt
 
     private StreamFactoryInterface $streamFactory;
 
-    private string $evaluateEndoint;
+    private string $baseURL;
 
     public static function create(string $baseUrl): self
     {
@@ -42,14 +43,14 @@ final class Flipt
             $baseUrl = mb_substr($baseUrl, 0, -1);
         }
 
-        $this->evaluateEndoint       = $baseUrl . static::RELATIVE_EVALUATE_ENDPOINT;
+        $this->baseURL       = $baseUrl;
     }
 
-    public function evaluate(EvaluateRequest $evaluateRequest): EvaluateResponse
+    public function evaluate(EvaluateRequest $evaluateRequest, string $namespace): EvaluateResponse
     {
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->evaluateEndoint
+            $this->baseURL . $namespace
         );
 
         $json = json_encode($evaluateRequest);
@@ -66,5 +67,33 @@ final class Flipt
         $data     = json_decode($response->getBody()->getContents(), true);
 
         return new EvaluateResponse($data);
+    }
+
+    /**
+     * @param EvaluateRequest[] $evaluateRequests
+     * @param string $namespace
+     * @return EvaluateResponse[]
+     */
+    public function evaluateBatch(array $evaluateRequests, string $namespace): array
+    {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->baseURL . $namespace
+        );
+
+        $json = json_encode(['requests' => $evaluateRequests]);
+
+        if ($json === false) {
+            $json = '';
+        }
+
+        $request = $request
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream($json));
+
+        $response = $this->client->sendRequest($request);
+        $responseBody = json_decode($response->getBody()->getContents(), true);
+
+        return array_map(fn($data) => new EvaluateResponse($data), $responseBody);
     }
 }
