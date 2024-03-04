@@ -46,7 +46,7 @@ final class Flipt
         $this->baseURL       = $baseUrl;
     }
 
-    public function evaluate(EvaluateRequest $evaluateRequest, string $namespace): EvaluateResponse
+    public function evaluate(EvaluateRequest $evaluateRequest, string $namespace = 'default'): EvaluateResponse
     {
         $request = $this->requestFactory->createRequest(
             'POST',
@@ -74,7 +74,7 @@ final class Flipt
      *
      * @return EvaluateResponse[]
      */
-    public function evaluateBatch(array $evaluateRequests, string $namespace): array
+    public function evaluateBatch(array $evaluateRequests, string $namespace = 'default'): array
     {
         $request = $this->requestFactory->createRequest(
             'POST',
