@@ -7,6 +7,7 @@ namespace Fetzi\Flipt;
 use Http\Client\HttpClient;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
@@ -72,9 +73,9 @@ final class Flipt
     /**
      * @param EvaluateRequest[] $evaluateRequests
      *
-     * @return EvaluateResponse[]
+     * @throws ClientExceptionInterface
      */
-    public function evaluateBatch(array $evaluateRequests, string $namespace = 'default'): array
+    public function evaluateBatch(array $evaluateRequests, string $namespace = 'default'): EvaluateResponses
     {
         $request = $this->requestFactory->createRequest(
             'POST',
@@ -92,8 +93,28 @@ final class Flipt
             ->withBody($this->streamFactory->createStream($json));
 
         $response     = $this->client->sendRequest($request);
+        $data         = json_decode($response->getBody()->getContents(), true);
+
+        return new EvaluateResponses($data);
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \Exception
+     */
+    public function listFlags(string $namespace = 'default'): FlagResponses
+    {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->baseURL . $namespace
+        );
+
+        $request = $request
+            ->withHeader('Content-Type', 'application/json');
+
+        $response     = $this->client->sendRequest($request);
         $responseBody = json_decode($response->getBody()->getContents(), true);
 
-        return array_map(fn ($data) => new EvaluateResponse($data), $responseBody);
+        return new FlagResponses($responseBody);
     }
 }
