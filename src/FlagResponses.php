@@ -27,7 +27,8 @@ final class FlagResponses
             return;
         }
 
-        print_r($data);
+        var_dump($data);
+        exit();
         $this->nextPageToken = $data['nextPageToken'] ?? '';
         $this->totalCount    = $data['totalCount'] ?? 0;
         foreach ($data['flags'] as $flag) {
