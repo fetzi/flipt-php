@@ -124,6 +124,8 @@ final class Flipt
         )
             ->withHeader('Content-Type', 'application/json');
 
+        var_dump($request->getUri());
+
         $response     = $this->client->sendRequest($request);
         $responseBody = json_decode($response->getBody()->getContents(), true);
 
