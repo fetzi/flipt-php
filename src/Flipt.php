@@ -13,8 +13,9 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class Flipt
 {
-    private const EVALUATE_ENDPOINT_WITH_NAMESPACE       = '/api/v1/namespaces/%s/evaluate';
-    private const EVALUATE_BATCH_ENDPOINT_WITH_NAMESPACE = '/api/v1/namespaces/%s/batch-evaluate';
+    private const PATH                                   = '/api/v1/namespaces/';
+    private const EVALUATE                               = '/evaluate';
+    private const EVALUATE_BATCH                         = '/batch-evaluate';
 
     private HttpClient $client;
 
@@ -51,7 +52,7 @@ final class Flipt
     {
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->baseURL . $namespace
+            $this->baseURL . self::PATH . $namespace . self::EVALUATE
         );
 
         $json = json_encode($evaluateRequest);
@@ -79,7 +80,7 @@ final class Flipt
     {
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->baseURL . $namespace
+            $this->baseURL . self::PATH . $namespace . self::EVALUATE_BATCH
         );
 
         $json = json_encode(['requests' => $evaluateRequests]);
