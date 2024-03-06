@@ -6,7 +6,6 @@ namespace Fetzi\Flipt;
 
 final class FlagResponses
 {
-    private const ERROR_CODE     = 5;
     private array $flags         = [];
     private string $nextPageToken;
     private int $totalCount;
