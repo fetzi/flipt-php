@@ -107,7 +107,7 @@ final class Flipt
     {
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->baseURL . $namespace
+            $this->baseURL . self::PATH . $namespace . 'flags'
         );
 
         $request = $request
