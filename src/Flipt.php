@@ -52,25 +52,30 @@ final class Flipt
 
     public function evaluate(EvaluateRequest $evaluateRequest, string $namespace = 'default'): EvaluateResponse
     {
-        $request = $this->requestFactory->createRequest(
-            'POST',
-            $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE
-        );
-
         $json = json_encode($evaluateRequest);
-
         if ($json === false) {
             $json = '';
         }
 
-        $request = $request
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE
+        )
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream($json));
+            ->withBody($this->streamFactory->createStream($json));;
 
         $response = $this->client->sendRequest($request);
-        $data     = json_decode($response->getBody()->getContents(), true);
+        $responseBody     = json_decode($response->getBody()->getContents(), true);
 
-        return new EvaluateResponse($data);
+        if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
+            $message = 'http status code is not 200';
+            if (array_key_exists('message', $responseBody)) {
+                $message = $responseBody['message'];
+            }
+            throw new \Exception($message);
+        }
+
+        return new EvaluateResponse($responseBody);
     }
 
     /**
@@ -89,7 +94,8 @@ final class Flipt
         $request = $this->requestFactory->createRequest(
             'POST',
             $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE_BATCH
-        )->withHeader('Content-Type', 'application/json')
+        )
+            ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream($json));
 
         $response             = $this->client->sendRequest($request);
@@ -115,9 +121,8 @@ final class Flipt
         $request = $this->requestFactory->createRequest(
             'POST',
             $this->baseURL . self::PATH . $namespace . self::REQUEST_FLAGS
-        )->withHeader('Content-Type', 'application/json');
-
-        var_dump($request->getUri());
+        )
+            ->withHeader('Content-Type', 'application/json');
 
         $response     = $this->client->sendRequest($request);
         $responseBody = json_decode($response->getBody()->getContents(), true);
