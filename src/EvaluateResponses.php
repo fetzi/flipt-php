@@ -22,12 +22,12 @@ final class EvaluateResponses
         }
     }
 
-    private function getRequestID(): string
+    public function getRequestID(): string
     {
         return $this->requestID;
     }
 
-    private function getrequestDurationMillis(): float
+    public function getrequestDurationMillis(): float
     {
         return $this->requestDurationMillis;
     }
@@ -35,7 +35,7 @@ final class EvaluateResponses
     /**
      * @return EvaluateResponse[]
      */
-    private function getResponses(): array
+    public function getResponses(): array
     {
         return $this->responses;
     }
