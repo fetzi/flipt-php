@@ -13,10 +13,11 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class Flipt
 {
-    private const HTTP_STATUS_OK                         = 200;
-    private const PATH                                   = '/api/v1/namespaces/';
-    private const EVALUATE                               = '/evaluate';
-    private const EVALUATE_BATCH                         = '/batch-evaluate';
+    private const HTTP_STATUS_OK          = 200;
+    private const PATH                    = '/api/v1/namespaces/';
+    private const REQUEST_EVALUATE        = '/evaluate';
+    private const REQUEST_EVALUATE_BATCH  = '/batch-evaluate';
+    private const REQUEST_FLAGS           = '/flags';
 
     private HttpClient $client;
 
@@ -53,7 +54,7 @@ final class Flipt
     {
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->baseURL . self::PATH . $namespace . self::EVALUATE
+            $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE
         );
 
         $json = json_encode($evaluateRequest);
@@ -87,7 +88,7 @@ final class Flipt
 
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->baseURL . self::PATH . $namespace . self::EVALUATE_BATCH
+            $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE_BATCH
         )->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream($json));
 
@@ -113,7 +114,7 @@ final class Flipt
     {
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->baseURL . self::PATH . $namespace . 'flags'
+            $this->baseURL . self::PATH . $namespace . self::REQUEST_FLAGS
         )->withHeader('Content-Type', 'application/json');
 
         var_dump($request->getUri());
