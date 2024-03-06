@@ -6,8 +6,6 @@ namespace Fetzi\Flipt;
 
 final class FlagResponse
 {
-    private bool $hasError       = false;
-    private string $errorMessage = '';
     private string $key;
     private string $name;
     private string $description;
@@ -24,13 +22,6 @@ final class FlagResponse
      */
     public function __construct(array $data)
     {
-        if (array_key_exists('error', $data)) {
-            $this->hasError     = true;
-            $this->errorMessage = $data['message'] ?? '';
-
-            return;
-        }
-
         $this->key          = $data['key'] ?? '';
         $this->name         = $data['name'] ?? '';
         $this->description  = $data['description'] ?? '';
@@ -39,16 +30,6 @@ final class FlagResponse
         $this->updatedAt    = new \DateTime($data['updatedAt']) ?? null;
         $this->variant      = $data['variants'] ?? [];
         $this->namespaceKey = $data['namespaceKey'] ?? '';
-    }
-
-    public function hasError(): bool
-    {
-        return $this->hasError;
-    }
-
-    public function getErrorMessage(): string
-    {
-        return $this->errorMessage;
     }
 
     public function getKey(): string
