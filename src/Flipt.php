@@ -119,12 +119,10 @@ final class Flipt
     public function listFlags(string $namespace = 'default'): FlagResponses
     {
         $request = $this->requestFactory->createRequest(
-            'POST',
+            'GET',
             $this->baseURL . self::PATH . $namespace . self::REQUEST_FLAGS
         )
             ->withHeader('Content-Type', 'application/json');
-
-        var_dump($request->getUri());
 
         $response     = $this->client->sendRequest($request);
         $responseBody = json_decode($response->getBody()->getContents(), true);
