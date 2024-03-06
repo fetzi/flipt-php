@@ -7,8 +7,6 @@ namespace Fetzi\Flipt;
 final class FlagResponses
 {
     private const ERROR_CODE     = 5;
-    private bool $hasError       = false;
-    private string $errorMessage = '';
     private array $flags         = [];
     private string $nextPageToken;
     private int $totalCount;
@@ -20,30 +18,11 @@ final class FlagResponses
      */
     public function __construct(array $data)
     {
-        if (array_key_exists('code', $data) && $data['code'] === self::ERROR_CODE) {
-            $this->hasError     = true;
-            $this->errorMessage = $data['message'] ?? '';
-
-            return;
-        }
-
-        var_dump($data);
-        exit();
         $this->nextPageToken = $data['nextPageToken'] ?? '';
         $this->totalCount    = $data['totalCount'] ?? 0;
         foreach ($data['flags'] as $flag) {
             $this->flags[] = new FlagResponse($flag);
         }
-    }
-
-    public function hasError(): bool
-    {
-        return $this->hasError;
-    }
-
-    public function getErrorMessage(): string
-    {
-        return $this->errorMessage;
     }
 
     /**

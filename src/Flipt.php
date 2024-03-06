@@ -13,6 +13,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class Flipt
 {
+    private const HTTP_STATUS_OK                         = 200;
     private const PATH                                   = '/api/v1/namespaces/';
     private const EVALUATE                               = '/evaluate';
     private const EVALUATE_BATCH                         = '/batch-evaluate';
@@ -78,25 +79,30 @@ final class Flipt
      */
     public function evaluateBatch(array $evaluateRequests, string $namespace = 'default'): EvaluateResponses
     {
-        $request = $this->requestFactory->createRequest(
-            'POST',
-            $this->baseURL . self::PATH . $namespace . self::EVALUATE_BATCH
-        );
-
         $json = json_encode(['requests' => $evaluateRequests]);
 
         if ($json === false) {
             $json = '';
         }
 
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->baseURL . self::PATH . $namespace . self::EVALUATE_BATCH
+        )->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream($json));
 
-        $response     = $this->client->sendRequest($request);
-        $data         = json_decode($response->getBody()->getContents(), true);
+        $response             = $this->client->sendRequest($request);
+        $responseBody         = json_decode($response->getBody()->getContents(), true);
 
-        return new EvaluateResponses($data);
+        if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
+            $message = 'http status code is not 200';
+            if (array_key_exists('message', $responseBody)) {
+                $message = $responseBody['message'];
+            }
+            throw new \Exception($message);
+        }
+
+        return new EvaluateResponses($responseBody);
     }
 
     /**
@@ -108,19 +114,21 @@ final class Flipt
         $request = $this->requestFactory->createRequest(
             'POST',
             $this->baseURL . self::PATH . $namespace . 'flags'
-        );
+        )->withHeader('Content-Type', 'application/json');
 
-        $request = $request
-            ->withHeader('Content-Type', 'application/json');
+        var_dump($request->getUri());
 
         $response     = $this->client->sendRequest($request);
         $responseBody = json_decode($response->getBody()->getContents(), true);
 
-        $result = new FlagResponses($responseBody);
-        if ($result->hasError()) {
-            throw new \Exception($result->getErrorMessage());
+        if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
+            $message = 'http status code is not 200';
+            if (array_key_exists('message', $responseBody)) {
+                $message = $responseBody['message'];
+            }
+            throw new \Exception($message);
         }
 
-        return $result;
+        return new FlagResponses($responseBody);
     }
 }
