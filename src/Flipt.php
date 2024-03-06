@@ -7,12 +7,17 @@ namespace Fetzi\Flipt;
 use Http\Client\HttpClient;
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
 final class Flipt
 {
-    private const RELATIVE_EVALUATE_ENDPOINT = '/api/v1/evaluate';
+    private const HTTP_STATUS_OK          = 200;
+    private const PATH                    = '/api/v1/namespaces/';
+    private const REQUEST_EVALUATE        = '/evaluate';
+    private const REQUEST_EVALUATE_BATCH  = '/batch-evaluate';
+    private const REQUEST_FLAGS           = '/flags';
 
     private HttpClient $client;
 
@@ -20,7 +25,7 @@ final class Flipt
 
     private StreamFactoryInterface $streamFactory;
 
-    private string $evaluateEndoint;
+    private string $baseURL;
 
     public static function create(string $baseUrl): self
     {
@@ -42,29 +47,94 @@ final class Flipt
             $baseUrl = mb_substr($baseUrl, 0, -1);
         }
 
-        $this->evaluateEndoint       = $baseUrl . static::RELATIVE_EVALUATE_ENDPOINT;
+        $this->baseURL       = $baseUrl;
     }
 
-    public function evaluate(EvaluateRequest $evaluateRequest): EvaluateResponse
+    public function evaluate(EvaluateRequest $evaluateRequest, string $namespace = 'default'): EvaluateResponse
     {
+        $json = json_encode($evaluateRequest);
+        if ($json === false) {
+            $json = '';
+        }
+
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->evaluateEndoint
-        );
+            $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE
+        )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream($json));;
 
-        $json = json_encode($evaluateRequest);
+        $response = $this->client->sendRequest($request);
+        $responseBody     = json_decode($response->getBody()->getContents(), true);
+
+        if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
+            $message = 'http status code is not 200';
+            if (array_key_exists('message', $responseBody)) {
+                $message = $responseBody['message'];
+            }
+            throw new \Exception($message);
+        }
+
+        return new EvaluateResponse($responseBody);
+    }
+
+    /**
+     * @param EvaluateRequest[] $evaluateRequests
+     *
+     * @throws ClientExceptionInterface
+     */
+    public function evaluateBatch(array $evaluateRequests, string $namespace = 'default'): EvaluateResponses
+    {
+        $json = json_encode(['requests' => $evaluateRequests]);
 
         if ($json === false) {
             $json = '';
         }
 
-        $request = $request
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE_BATCH
+        )
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream($json));
 
-        $response = $this->client->sendRequest($request);
-        $data     = json_decode($response->getBody()->getContents(), true);
+        $response             = $this->client->sendRequest($request);
+        $responseBody         = json_decode($response->getBody()->getContents(), true);
 
-        return new EvaluateResponse($data);
+        if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
+            $message = 'http status code is not 200';
+            if (array_key_exists('message', $responseBody)) {
+                $message = $responseBody['message'];
+            }
+            throw new \Exception($message);
+        }
+
+        return new EvaluateResponses($responseBody);
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \Exception
+     */
+    public function listFlags(string $namespace = 'default'): FlagResponses
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            $this->baseURL . self::PATH . $namespace . self::REQUEST_FLAGS
+        )
+            ->withHeader('Content-Type', 'application/json');
+
+        $response     = $this->client->sendRequest($request);
+        $responseBody = json_decode($response->getBody()->getContents(), true);
+
+        if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
+            $message = 'http status code is not 200';
+            if (array_key_exists('message', $responseBody)) {
+                $message = $responseBody['message'];
+            }
+            throw new \Exception($message);
+        }
+
+        return new FlagResponses($responseBody);
     }
 }

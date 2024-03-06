@@ -20,21 +20,11 @@ final class EvaluateResponse
     private string $value                = '';
     private float $requestDurationMillis = 0.0;
 
-    private bool $hasError       = false;
-    private string $errorMessage = '';
-
     /**
      * @param array<string, mixed> $data
      */
     public function __construct(array $data)
     {
-        if (array_key_exists('error', $data)) {
-            $this->hasError     = true;
-            $this->errorMessage = $data['message'] ?? '';
-
-            return;
-        }
-
         $this->requestId             = $data['requestId'] ?? '';
         $this->entityId              = $data['entityId'] ?? '';
         $this->context               = $data['context'] ?? [];
@@ -44,11 +34,6 @@ final class EvaluateResponse
         $this->timestamp             = isset($data['timestamp']) ? $this->parseDataTimestamp($data['timestamp']) : new \DateTime('now');
         $this->value                 = $data['value'] ?? '';
         $this->requestDurationMillis = $data['requestDurationMillis'] ?? 0.0;
-    }
-
-    public function hasError(): bool
-    {
-        return $this->hasError;
     }
 
     public function getRequestId(): string
@@ -71,10 +56,6 @@ final class EvaluateResponse
 
     public function isMatch(): bool
     {
-        if ($this->hasError()) {
-            return false;
-        }
-
         return $this->match;
     }
 
