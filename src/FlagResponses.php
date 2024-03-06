@@ -6,6 +6,7 @@ namespace Fetzi\Flipt;
 
 final class FlagResponses
 {
+    private const ERROR_CODE     = 5;
     private bool $hasError       = false;
     private string $errorMessage = '';
     private array $flags         = [];
@@ -19,7 +20,7 @@ final class FlagResponses
      */
     public function __construct(array $data)
     {
-        if (array_key_exists('error', $data)) {
+        if (array_key_exists('code', $data) && $data['code'] === self::ERROR_CODE) {
             $this->hasError     = true;
             $this->errorMessage = $data['message'] ?? '';
 

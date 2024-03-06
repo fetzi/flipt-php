@@ -116,6 +116,11 @@ final class Flipt
         $response     = $this->client->sendRequest($request);
         $responseBody = json_decode($response->getBody()->getContents(), true);
 
-        return new FlagResponses($responseBody);
+        $result = new FlagResponses($responseBody);
+        if ($result->hasError()) {
+            throw new \Exception($result->getErrorMessage());
+        }
+
+        return $result;
     }
 }
