@@ -1,5 +1,5 @@
 {
-    "name": "fetzi/flipt-php",
+    "name": "indels/flipt-php",
     "description": "A PHP package for integrating the Flipt REST API",
     "keywords": [
         "php",
@@ -29,7 +29,7 @@
     "require-dev": {
         "pestphp/pest": "^1.2",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "phpstan/phpstan": "^0.12.88",
+        "phpstan/phpstan": "^0.12.100",
         "phpstan/phpstan-strict-rules": "^0.12.9",
         "ergebnis/phpstan-rules": "^0.15.3",
         "thecodingmachine/phpstan-strict-rules": "^0.12.1",
@@ -40,12 +40,18 @@
     "scripts": {
         "test:unit": "vendor/bin/pest --colors=always",
         "test:lint": "vendor/bin/php-cs-fixer fix -v --dry-run",
-        "test:types":"vendor/bin/phpstan analyse --ansi --memory-limit=0",
+        "test:types":"vendor/bin/phpstan analyse --ansi",
         "fix": "vendor/bin/php-cs-fixer fix -v",
         "test": [
             "@test:lint",
             "@test:types",
             "@test:unit"
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
     }
 }

@@ -11,12 +11,12 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 
 beforeEach(function () {
-    $this->client = new Client();
+    $this->client   = new Client();
     $requestFactory = Mockery::mock(RequestFactoryInterface::class)->shouldIgnoreMissing();
-    $streamFactory = Mockery::mock(StreamFactoryInterface::class)->shouldIgnoreMissing();
+    $streamFactory  = Mockery::mock(StreamFactoryInterface::class)->shouldIgnoreMissing();
 
-    $request = Mockery::mock(RequestInterface::class);
-    $response = Mockery::mock(ResponseInterface::class);
+    $request      = Mockery::mock(RequestInterface::class);
+    $response     = Mockery::mock(ResponseInterface::class);
     $this->stream = Mockery::mock(StreamInterface::class);
 
     $requestFactory->shouldReceive('createRequest')->andReturn($request);
@@ -28,7 +28,7 @@ beforeEach(function () {
 
     $this->client->addResponse($response);
 
-    $this->flipt = new Flipt($this->client, $requestFactory, $streamFactory, 'dummy');
+    $this->flipt = new Flipt($this->client);
 });
 
 it('does not match for a disabled flag', function () {
@@ -43,6 +43,16 @@ it('does not match for a disabled flag', function () {
 
 it('matches a simple feature flag', function () {
     $this->stream->shouldReceive('getContents')->andReturn(file_get_contents(__DIR__ . '/responses/simpleMatched.json'));
+
+    $response = $this->flipt->evaluate(new EvaluateRequest('foo', 'id', []));
+
+    expect($response)->toBeInstanceOf(EvaluateResponse::class);
+    expect($response->hasError())->toBeFalse();
+    expect($response->isMatch())->toBeTrue();
+});
+
+it('matches a simple feature flag 2', function () {
+    $this->stream->shouldReceive('getContents')->andReturn(file_get_contents(__DIR__ . '/responses/simpleMatched2.json'));
 
     $response = $this->flipt->evaluate(new EvaluateRequest('foo', 'id', []));
 
