@@ -52,7 +52,7 @@ final class Flipt
                 'headers' => [
                     'Content-Type' => 'application/json',
                 ],
-                'json' => $json,
+                'body' => $json,
             ]
         );
         $responseBody     = json_decode($response->getBody()->getContents(), true);
@@ -87,7 +87,7 @@ final class Flipt
                 'headers' => [
                     'Content-Type' => 'application/json',
                 ],
-                'json' => $json,
+                'body' => $json,
             ]
         );
 
