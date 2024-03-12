@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace Fetzi\Flipt;
 
-use Http\Client\HttpClient;
-use Http\Discovery\HttpClientDiscovery;
-use Http\Discovery\Psr17FactoryDiscovery;
+use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
 
 final class Flipt
 {
@@ -19,35 +15,25 @@ final class Flipt
     private const REQUEST_EVALUATE_BATCH  = '/batch-evaluate';
     private const REQUEST_FLAGS           = '/flags';
 
-    private HttpClient $client;
+    private Client $client;
 
-    private RequestFactoryInterface $requestFactory;
-
-    private StreamFactoryInterface $streamFactory;
-
-    private string $baseURL;
-
-    public static function create(string $baseUrl): self
+    public static function create(string $baseUrl, float $timeout): self
     {
-        return new static(
-            HttpClientDiscovery::find(),
-            Psr17FactoryDiscovery::findRequestFactory(),
-            Psr17FactoryDiscovery::findStreamFactory(),
-            $baseUrl
-        );
-    }
-
-    public function __construct(HttpClient $client, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, string $baseUrl)
-    {
-        $this->client          = $client;
-        $this->requestFactory  = $requestFactory;
-        $this->streamFactory   = $streamFactory;
-
         if (mb_substr($baseUrl, -1) === '/') {
             $baseUrl = mb_substr($baseUrl, 0, -1);
         }
 
-        $this->baseURL       = $baseUrl;
+        $httpClient = new Client([
+            'base_uri' => $baseUrl,
+            'timeout'  => $timeout,
+        ]);
+
+        return new static($httpClient);
+    }
+
+    public function __construct(Client $client)
+    {
+        $this->client = $client;
     }
 
     public function evaluate(EvaluateRequest $evaluateRequest, string $namespace = 'default'): EvaluateResponse
@@ -57,14 +43,15 @@ final class Flipt
             $json = '';
         }
 
-        $request = $this->requestFactory->createRequest(
-            'POST',
-            $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE
-        )
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream($json));;
-
-        $response = $this->client->sendRequest($request);
+        $response         = $this->client->post(
+            self::PATH . $namespace . self::REQUEST_EVALUATE,
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => $json,
+            ]
+        );
         $responseBody     = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
@@ -72,7 +59,7 @@ final class Flipt
             if (array_key_exists('message', $responseBody)) {
                 $message = $responseBody['message'];
             }
-            throw new \Exception($message);
+            throw new \Exception('method: evaluate, ' . $message);
         }
 
         return new EvaluateResponse($responseBody);
@@ -91,14 +78,16 @@ final class Flipt
             $json = '';
         }
 
-        $request = $this->requestFactory->createRequest(
-            'POST',
-            $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE_BATCH
-        )
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream($json));
+        $response             = $this->client->post(
+            self::PATH . $namespace . self::REQUEST_EVALUATE_BATCH,
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => $json,
+            ]
+        );
 
-        $response             = $this->client->sendRequest($request);
         $responseBody         = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
@@ -106,7 +95,7 @@ final class Flipt
             if (array_key_exists('message', $responseBody)) {
                 $message = $responseBody['message'];
             }
-            throw new \Exception($message);
+            throw new \Exception('method: evaluate batch, ' . $message);
         }
 
         return new EvaluateResponses($responseBody);
@@ -118,13 +107,15 @@ final class Flipt
      */
     public function listFlags(string $namespace = 'default'): FlagResponses
     {
-        $request = $this->requestFactory->createRequest(
-            'GET',
-            $this->baseURL . self::PATH . $namespace . self::REQUEST_FLAGS
-        )
-            ->withHeader('Content-Type', 'application/json');
+        $response     = $this->client->get(
+            self::PATH . $namespace . self::REQUEST_FLAGS,
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+            ]
+        );
 
-        $response     = $this->client->sendRequest($request);
         $responseBody = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
@@ -132,7 +123,7 @@ final class Flipt
             if (array_key_exists('message', $responseBody)) {
                 $message = $responseBody['message'];
             }
-            throw new \Exception($message);
+            throw new \Exception('method: list flags, ' . $message);
         }
 
         return new FlagResponses($responseBody);
