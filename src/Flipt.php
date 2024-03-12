@@ -59,7 +59,7 @@ final class Flipt
             if (array_key_exists('message', $responseBody)) {
                 $message = $responseBody['message'];
             }
-            throw new \Exception($message);
+            throw new \Exception('method: evaluate, ' . $message);
         }
 
         return new EvaluateResponse($responseBody);
@@ -95,7 +95,7 @@ final class Flipt
             if (array_key_exists('message', $responseBody)) {
                 $message = $responseBody['message'];
             }
-            throw new \Exception($message);
+            throw new \Exception('method: evaluate batch, ' . $message);
         }
 
         return new EvaluateResponses($responseBody);
@@ -123,7 +123,7 @@ final class Flipt
             if (array_key_exists('message', $responseBody)) {
                 $message = $responseBody['message'];
             }
-            throw new \Exception($message);
+            throw new \Exception('method: list flags, ' . $message);
         }
 
         return new FlagResponses($responseBody);
