@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Fetzi\Flipt;
 
 use GuzzleHttp\Client;
-use Http\Discovery\Psr17FactoryDiscovery;
 use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
 
 final class Flipt
 {
@@ -20,7 +17,7 @@ final class Flipt
 
     private Client $client;
 
-    public static function create(string $baseUrl, int $timeout): self
+    public static function create(string $baseUrl, float $timeout): self
     {
         if (mb_substr($baseUrl, -1) === '/') {
             $baseUrl = mb_substr($baseUrl, 0, -1);
