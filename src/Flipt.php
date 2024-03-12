@@ -56,6 +56,7 @@ final class Flipt
             $json = '';
         }
 
+        var_dump($this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE);
         $request = $this->requestFactory->createRequest(
             'POST',
             $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE
