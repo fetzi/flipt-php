@@ -46,10 +46,6 @@ final class Flipt
         $this->requestFactory  = $requestFactory;
         $this->streamFactory   = $streamFactory;
 
-        if (mb_substr($baseUrl, -1) === '/') {
-            $baseUrl = mb_substr($baseUrl, 0, -1);
-        }
-
         $this->baseURL       = $baseUrl;
     }
 
