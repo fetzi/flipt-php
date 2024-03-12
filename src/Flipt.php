@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Fetzi\Flipt;
 
-use Http\Client\HttpClient;
-use Http\Discovery\HttpClientDiscovery;
+use GuzzleHttp\Client;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -19,7 +18,7 @@ final class Flipt
     private const REQUEST_EVALUATE_BATCH  = '/batch-evaluate';
     private const REQUEST_FLAGS           = '/flags';
 
-    private HttpClient $client;
+    private Client $client;
 
     private RequestFactoryInterface $requestFactory;
 
@@ -27,17 +26,21 @@ final class Flipt
 
     private string $baseURL;
 
-    public static function create(string $baseUrl): self
+    public static function create(string $baseUrl, int $timeout): self
     {
+        $httpClient = new Client([
+            'timeout'  => $timeout,
+        ]);
+
         return new static(
-            HttpClientDiscovery::find(),
+            $httpClient,
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory(),
             $baseUrl
         );
     }
 
-    public function __construct(HttpClient $client, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, string $baseUrl)
+    public function __construct(Client $client, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, string $baseUrl)
     {
         $this->client          = $client;
         $this->requestFactory  = $requestFactory;
@@ -62,9 +65,9 @@ final class Flipt
             $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE
         )
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream($json));;
+            ->withBody($this->streamFactory->createStream($json));
 
-        $response = $this->client->sendRequest($request);
+        $response         = $this->client->sendRequest($request);
         $responseBody     = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
