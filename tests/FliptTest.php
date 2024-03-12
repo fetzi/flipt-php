@@ -28,7 +28,7 @@ beforeEach(function () {
 
     $this->client->addResponse($response);
 
-    $this->flipt = new Flipt($this->client, $requestFactory, $streamFactory, 'dummy');
+    $this->flipt = new Flipt($this->client);
 });
 
 it('does not match for a disabled flag', function () {

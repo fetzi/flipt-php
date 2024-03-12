@@ -20,33 +20,23 @@ final class Flipt
 
     private Client $client;
 
-    private RequestFactoryInterface $requestFactory;
-
-    private StreamFactoryInterface $streamFactory;
-
-    private string $baseURL;
-
     public static function create(string $baseUrl, int $timeout): self
     {
+        if (mb_substr($baseUrl, -1) === '/') {
+            $baseUrl = mb_substr($baseUrl, 0, -1);
+        }
+
         $httpClient = new Client([
+            'base_uri' => $baseUrl,
             'timeout'  => $timeout,
         ]);
 
-        return new static(
-            $httpClient,
-            Psr17FactoryDiscovery::findRequestFactory(),
-            Psr17FactoryDiscovery::findStreamFactory(),
-            $baseUrl
-        );
+        return new static($httpClient);
     }
 
-    public function __construct(Client $client, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory, string $baseUrl)
+    public function __construct(Client $client)
     {
-        $this->client          = $client;
-        $this->requestFactory  = $requestFactory;
-        $this->streamFactory   = $streamFactory;
-
-        $this->baseURL       = $baseUrl;
+        $this->client = $client;
     }
 
     public function evaluate(EvaluateRequest $evaluateRequest, string $namespace = 'default'): EvaluateResponse
@@ -56,15 +46,15 @@ final class Flipt
             $json = '';
         }
 
-        var_dump($this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE);
-        $request = $this->requestFactory->createRequest(
-            'POST',
-            $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE
-        )
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream($json));
-
-        $response         = $this->client->sendRequest($request);
+        $response         = $this->client->post(
+            self::PATH . $namespace . self::REQUEST_EVALUATE,
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $json,
+            ]
+        );
         $responseBody     = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
@@ -91,14 +81,16 @@ final class Flipt
             $json = '';
         }
 
-        $request = $this->requestFactory->createRequest(
-            'POST',
-            $this->baseURL . self::PATH . $namespace . self::REQUEST_EVALUATE_BATCH
-        )
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream($json));
+        $response             = $this->client->post(
+            self::PATH . $namespace . self::REQUEST_EVALUATE_BATCH,
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $json,
+            ]
+        );
 
-        $response             = $this->client->sendRequest($request);
         $responseBody         = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
@@ -118,13 +110,15 @@ final class Flipt
      */
     public function listFlags(string $namespace = 'default'): FlagResponses
     {
-        $request = $this->requestFactory->createRequest(
-            'GET',
-            $this->baseURL . self::PATH . $namespace . self::REQUEST_FLAGS
-        )
-            ->withHeader('Content-Type', 'application/json');
+        $response     = $this->client->get(
+            self::PATH . $namespace . self::REQUEST_FLAGS,
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+            ]
+        );
 
-        $response     = $this->client->sendRequest($request);
         $responseBody = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() !== self::HTTP_STATUS_OK) {
