@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Fetzi\Flipt;
+namespace Fetzi\Flipt\models;
 
 final class EvaluateRequest implements \JsonSerializable
 {
+    private string $namespace;
     private string $flagKey;
     private string $entityId;
 
@@ -17,11 +18,17 @@ final class EvaluateRequest implements \JsonSerializable
     /**
      * @param array<string, mixed> $context
      */
-    public function __construct(string $flagKey, string $entityId, array $context)
+    public function __construct(string $namespace, string $flagKey, string $entityId, array $context)
     {
-        $this->flagKey  = $flagKey;
-        $this->entityId = $entityId;
-        $this->context  = $context;
+        $this->namespace = $namespace;
+        $this->flagKey   = $flagKey;
+        $this->entityId  = $entityId;
+        $this->context   = $context;
+    }
+
+    public function getNamespace(): string
+    {
+        return $this->namespace;
     }
 
     public function getFlagKey(): string
@@ -48,9 +55,10 @@ final class EvaluateRequest implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'flag_key'  => $this->flagKey,
-            'entity_id' => $this->entityId,
-            'context'   => (object) $this->context,
+            'namespaceKey' => $this->namespace,
+            'flagKey'      => $this->flagKey,
+            'entityId'     => $this->entityId,
+            'context'      => (object) $this->context,
         ];
     }
 }

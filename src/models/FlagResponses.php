@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Fetzi\Flipt;
+namespace Fetzi\Flipt\models;
 
 final class FlagResponses
 {
-    private array $flags         = [];
+    /**
+     * @var FlagResponse[]
+     */
+    private array $flags = [];
     private string $nextPageToken;
     private int $totalCount;
 
@@ -30,11 +33,6 @@ final class FlagResponses
     public function getFlags(): array
     {
         return $this->flags;
-    }
-
-    public function getFlagFromIndex(int $index): FlagResponse
-    {
-        return $this->flags[$index];
     }
 
     public function getNextPageToken(): string

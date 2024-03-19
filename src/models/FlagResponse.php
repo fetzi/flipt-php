@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Fetzi\Flipt;
+namespace Fetzi\Flipt\models;
 
 final class FlagResponse
 {
+    public const BOOLEAN_FLAG_TYPE = 'BOOLEAN_FLAG_TYPE';
+    public const VARIANT_FLAG_TYPE = 'VARIANT_FLAG_TYPE';
     private string $key;
     private string $name;
     private string $description;
@@ -14,6 +16,7 @@ final class FlagResponse
     private \DateTime $updatedAt;
     private array $variant;
     private string $namespaceKey;
+    private string $type;
 
     /**
      * @param array<string, mixed> $data
@@ -30,6 +33,7 @@ final class FlagResponse
         $this->updatedAt    = new \DateTime($data['updatedAt']) ?? null;
         $this->variant      = $data['variants'] ?? [];
         $this->namespaceKey = $data['namespaceKey'] ?? '';
+        $this->type         = $data['type'] ?? '';
     }
 
     public function getKey(): string
@@ -70,5 +74,10 @@ final class FlagResponse
     public function getNamespaceKey(): string
     {
         return $this->namespaceKey;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 }
